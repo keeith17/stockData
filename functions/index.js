@@ -8,7 +8,7 @@ exports.updateRandomValue = functions.pubsub
     .onRun(async () => {
         const db = admin.firestore();
         const weightedNumbers = [
-            2, 1, 2, 1, 3, 1, 5, 1, 4, 2, 1, 5, 1, 5, 1, 2, 3, 4, 5,
+            2, 1, 2, 1, 3, 1, 5, 1, 2, 4, 2, 1, 5, 1, 5, 1, 2, 3, 4, 5,
         ];
 
         const randomValue1 =
