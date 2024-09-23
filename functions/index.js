@@ -5,7 +5,7 @@ admin.initializeApp();
 
 // 5분마다 Firestore에서 최근 value를 가져와 계산 후 저장하는 함수
 exports.updateRandomValue = functions.pubsub
-    .schedule("*/5 * * * *")
+    .schedule("0 */3 * * *")
     .onRun(async () => {
         const db = admin.firestore();
         const randomValue = 0.8 + Math.random() * 0.4; // 0과 1 사이의 새로운 랜덤 값 생성
