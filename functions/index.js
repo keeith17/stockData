@@ -7,9 +7,19 @@ exports.updateRandomValue = functions.pubsub
     .schedule("*/5 * * * *")
     .onRun(async () => {
         const db = admin.firestore();
-        const weightedNumbers = [
+        // Firestore에서 가장 최근의 문서 가져오기
+        const latestDoc = await db
+            .collection("stockValue")
+            .orderBy("timestamp", "desc") // 최신 문서부터 정렬
+            .limit(1) // 하나만 가져오기
+            .get();
+
+        let weightedNumbers = [
             2, 1, 2, 1, 3, 1, 5, 1, 2, 4, 2, 1, 5, 1, 5, 1, 2, 3, 4, 5,
         ];
+        if (latestDoc.docs[0].data().count >= 8) {
+            weightedNumbers = [2, 1, 2, 1, 3, 1, 1, 2, 2, 1, 1, 1, 2, 3];
+        }
 
         const randomValue1 =
             weightedNumbers[Math.floor(Math.random() * weightedNumbers.length)];
@@ -21,13 +31,6 @@ exports.updateRandomValue = functions.pubsub
             weightedNumbers[Math.floor(Math.random() * weightedNumbers.length)];
         const randomValue5 =
             weightedNumbers[Math.floor(Math.random() * weightedNumbers.length)];
-
-        // Firestore에서 가장 최근의 문서 가져오기
-        const latestDoc = await db
-            .collection("stockValue")
-            .orderBy("timestamp", "desc") // 최신 문서부터 정렬
-            .limit(1) // 하나만 가져오기
-            .get();
 
         let lastValue1 = 1;
         let lastValue2 = 1;
@@ -62,6 +65,7 @@ exports.updateRandomValue = functions.pubsub
                 ship3: 1,
                 ship4: 1,
                 ship5: 1,
+                open: 1,
                 count: 1,
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
             });
@@ -78,7 +82,8 @@ exports.updateRandomValue = functions.pubsub
                 ship3: 1,
                 ship4: 1,
                 ship5: 1,
-                count: latestDoc.docs[0].data().count + 1,
+                open: latestDoc.docs[0].data().open + 1,
+                count: 1,
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
             });
         } else {
@@ -88,7 +93,8 @@ exports.updateRandomValue = functions.pubsub
                 ship3: newValue3,
                 ship4: newValue4,
                 ship5: newValue5,
-                count: latestDoc.docs[0].data().count,
+                open: latestDoc.docs[0].data().open,
+                count: latestDoc.docs[0].data().count + 1,
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
             });
         }
