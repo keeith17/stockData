@@ -15,11 +15,11 @@ exports.updateRandomValue = functions.pubsub
             .get();
 
         let weightedNumbers = [
-            2, 1, 2, 1, 3, 1, 5, 1, 2, 4, 2, 1, 5, 1, 5, 1, 2, 3, 4, 5,
+            2, 1, 2, 1, 3, 1, 5, 1, 3, 2, 1, 4, 2, 1, 5, 1, 5, 1, 2, 3, 4, 5,
         ];
         if (!latestDoc.empty && latestDoc.docs[0].data().count >= 8) {
             weightedNumbers = [
-                2, 1, 2, 1, 3, 1, 1, 5, 1, 2, 2, 1, 4, 1, 1, 2, 3,
+                2, 1, 2, 1, 3, 1, 1, 1, 2, 5, 1, 2, 2, 1, 4, 1, 1, 2, 3,
             ];
         }
 
@@ -88,6 +88,24 @@ exports.updateRandomValue = functions.pubsub
                 count: 1,
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
             });
+            // ship1부터 ship5까지 검사하여 25인 경우 키 이름을 배열에 추가
+            const ships = ["ship1", "ship2", "ship3", "ship4", "ship5"];
+            const matchingShips = [];
+
+            ships.forEach((ship) => {
+                if (latestDoc.docs[0].data()[ship] === 25) {
+                    matchingShips.push(ship);
+                }
+            });
+
+            // prize 컬렉션에 ship1이라는 이름의 문서 생성
+            await db
+                .collection("prize")
+                .doc("open" + latestDoc.docs[0].data().open)
+                .set({
+                    value: matchingShips, // 25에 해당하는 ship 이름들을 배열로 저장
+                    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                });
         } else {
             await db.collection("stockValue").add({
                 ship1: newValue1,
