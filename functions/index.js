@@ -4,7 +4,7 @@ admin.initializeApp();
 
 // 5분마다 Firestore에서 최근 value를 가져와 계산 후 저장하는 함수
 exports.updateRandomValue = functions.pubsub
-    .schedule("*/5 * * * *")
+    .schedule("*/30 * * * *")
     .onRun(async () => {
         const db = admin.firestore();
         // Firestore에서 가장 최근의 문서 가져오기
